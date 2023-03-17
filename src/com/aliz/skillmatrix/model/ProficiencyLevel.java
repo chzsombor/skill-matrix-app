@@ -1,8 +1,9 @@
 package com.aliz.skillmatrix.model;
 
 public enum ProficiencyLevel {
-    BEGINNER,
+    NOVICE,
     INTERMEDIATE,
+    PROFICIENT,
     ADVANCED,
     EXPERT
 }
