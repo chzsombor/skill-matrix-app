@@ -22,11 +22,24 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User save(User user) {
+    public User create(User user) {
         return userRepository.save(user);
     }
 
-    public void deleteById(Long id) {
+    public User update(Long id, User updatedUser) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        user.setFirstName(updatedUser.getFirstName());
+        user.setLastName(updatedUser.getLastName());
+        user.setEmail(updatedUser.getEmail());
+
+        // Update any other fields as needed
+
+        return userRepository.save(user);
+    }
+
+    public void delete(Long id) {
         userRepository.deleteById(id);
     }
 

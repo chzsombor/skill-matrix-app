@@ -22,11 +22,21 @@ public class UserSkillService {
         return userSkillRepository.findById(id);
     }
 
-    public UserSkill save(UserSkill userSkill) {
+    public UserSkill create(UserSkill userSkill) {
         return userSkillRepository.save(userSkill);
     }
 
-    public void deleteById(Long id) {
+    public UserSkill update(Long id, UserSkill updatedUserSkill) {
+        UserSkill userSkill = userSkillRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("UserSkill not found with id: " + id));
+
+        userSkill.setSkill(updatedUserSkill.getSkill());
+        userSkill.setProficiencyLevel(updatedUserSkill.getProficiencyLevel());
+
+        return userSkillRepository.save(userSkill);
+    }
+
+    public void delete(Long id) {
         userSkillRepository.deleteById(id);
     }
 

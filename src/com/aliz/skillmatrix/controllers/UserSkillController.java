@@ -2,7 +2,9 @@ package com.aliz.skillmatrix.controllers;
 
 import com.aliz.skillmatrix.model.UserSkill;
 import com.aliz.skillmatrix.services.UserSkillService;
+import com.aliz.skillmatrix.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,35 +18,28 @@ public class UserSkillController {
     private UserSkillService userSkillService;
 
     @GetMapping
-    public List<UserSkill> findAll() {
-        return userSkillService.findAll();
+    public ApiResponse<List<UserSkill>> findAll() {
+        return new ApiResponse<>(HttpStatus.OK.value(), userSkillService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserSkill> findById(@PathVariable Long id) {
-        return userSkillService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ApiResponse<UserSkill> findById(@PathVariable Long id) {
+        return new ApiResponse<>(HttpStatus.OK.value(), userSkillService.findById(id).orElse(null));
     }
 
     @PostMapping
-    public UserSkill save(@RequestBody UserSkill userSkill) {
-        return userSkillService.save(userSkill);
+    public ApiResponse<UserSkill> create(@RequestBody UserSkill userSkill) {
+        return new ApiResponse<>(HttpStatus.CREATED.value(), userSkillService.create(userSkill));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserSkill> update(@PathVariable Long id, @RequestBody UserSkill userSkill) {
-        return userSkillService.findById(id)
-                .map(existingUserSkill -> {
-                    userSkill.setId(existingUserSkill.getId());
-                    return ResponseEntity.ok(userSkillService.save(userSkill));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ApiResponse<UserSkill> update(@PathVariable Long id, @RequestBody UserSkill userSkill) {
+        return new ApiResponse<>(HttpStatus.OK.value(), userSkillService.update(id, userSkill));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        userSkillService.findById(id).ifPresent(userSkill -> userSkillService.deleteById(id));
+        userSkillService.findById(id).ifPresent(userSkill -> userSkillService.delete(id));
         return ResponseEntity.noContent().build();
     }
 

@@ -2,8 +2,9 @@ package com.aliz.skillmatrix.controllers;
 
 import com.aliz.skillmatrix.model.User;
 import com.aliz.skillmatrix.services.UserService;
+import com.aliz.skillmatrix.util.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,36 +17,29 @@ public class UserController {
     private UserService userService;
 
     @GetMapping
-    public List<User> findAll() {
-        return userService.findAll();
+    public ApiResponse<List<User>> findAll() {
+        return new ApiResponse<>(HttpStatus.OK.value(), userService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id) {
-        return userService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ApiResponse<User> findById(@PathVariable Long id) {
+        User user = userService.findById(id).orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return new ApiResponse<>(HttpStatus.OK.value(), user);
     }
 
     @PostMapping
-    public User save(@RequestBody User user) {
-        return userService.save(user);
+    public ApiResponse<User> create(@RequestBody User user) {
+        return new ApiResponse<>(HttpStatus.CREATED.value(), userService.create(user));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody User user) {
-        return userService.findById(id)
-                .map(existingUser -> {
-                    user.setId(existingUser.getId());
-                    return ResponseEntity.ok(userService.save(user));
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ApiResponse<User> update(@PathVariable Long id, @RequestBody User user) {
+        return new ApiResponse<>(HttpStatus.OK.value(), userService.update(id, user));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        userService.findById(id).ifPresent(user -> userService.deleteById(id));
-        return ResponseEntity.noContent().build();
+    public ApiResponse<String> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return new ApiResponse<>(HttpStatus.OK.value(), "User deleted successfully");
     }
-
 }
